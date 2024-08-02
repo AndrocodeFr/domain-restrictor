@@ -1,25 +1,29 @@
-/*
- *
- * HomePage
- *
- */
-
 import React, { useEffect, useState } from 'react';
 import pluginId from '../../pluginId';
-import { BaseCheckbox, Button, Table, Tbody, Td, TextInput, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import domainRequest from '../../api/domain';
+import { BaseCheckbox, Button, Table, Tbody, Td, TextInput, Th, Thead, Tr, Typography, BaseHeaderLayout, Layout } from '@strapi/design-system';
 import './style.css';
+import { LoadingIndicatorPage } from '@strapi/helper-plugin';
 
 const HomePage = () => {
+
+  const [isLoading, setIsLoading] = useState(true);
   const [domain, setDomain] = useState('');
   const [domains, setDomains] = useState([]);
   const [checkedAll, setCheckedAll] = useState(false);
 
+  const fetchDomains = async () => {
+    if (isLoading === false) setIsLoading(true);
+    const data = await domainRequest.getDomains();
+    setDomains(data);
+    setIsLoading(false);
+  }
+
   useEffect(() => {
-    const currentDomain = window.location.hostname;
-    setDomains([{ id: 1, name: currentDomain, checked: false, immutable: true }]);
+    fetchDomains();
   }, []);
 
-  const addDomain = () => {
+  const addDomain = async () => {
     if (!domain) return;
 
     const id = domains.length + 1;
@@ -27,7 +31,7 @@ const HomePage = () => {
     setDomain('');
   };
 
-  const removeDomain = () => {
+  const removeDomain = async () => {
     const currentDomain = domains.find(domain => domain.immutable);
     const otherDomains = domains.filter(domain => !domain.immutable);
 
@@ -51,7 +55,7 @@ const HomePage = () => {
     }
   };
 
-  const checkDomain = (id) => {
+  const checkDomain = async (id) => {
     const newDomains = domains.map(domain => {
       if (domain.id === id) {
         return { ...domain, checked: !domain.checked };
@@ -69,7 +73,7 @@ const HomePage = () => {
     }
   };
 
-  const globalCheck = () => {
+  const globalCheck = async () => {
     setCheckedAll(!checkedAll);
     if (checkedAll) {
       uncheckAll();
@@ -78,72 +82,87 @@ const HomePage = () => {
     }
   };
 
-  const checkAll = () => {
+  const checkAll = async () => {
     const newDomains = domains.map(domain => ({ ...domain, checked: true }));
     setDomains(newDomains);
   };
 
-  const uncheckAll = () => {
+  const uncheckAll = async () => {
     const newDomains = domains.map(domain => ({ ...domain, checked: false }));
     setDomains(newDomains);
   };
 
+  if (isLoading) {
+    return <LoadingIndicatorPage />;
+  }
+
   return (
-    <div className='main'>
-      <Typography variant="alpha">Limiteur de domaine</Typography>
+    <Layout sideNav={null}>
 
-      <div className='description'>
-        <p>
-          Sur votre server vous possédez <b>plusieurs</b> sous domaines et vous limitez ce strapi à seulement certains. Saisissez ci  dessous le/les domaines que vous souhaité autorisé !
-        </p>
-        <p className="warning-message">
-          <b>Attention</b>, ne vous trompez pas une fois saisis, si vous rechargez la page et que ce n'est pas le bon domaine vous serez bloqué.
-        </p>
+      <BaseHeaderLayout
+        title="Limiteur de domaine"
+        description="Permet de limiter l'accès à votre strapi à certains domaines"
+        as="h1"
+      />
+
+      <div className='main'>
+
+        <div className='description'>
+          <p>
+            Sur votre server vous possédez <b>plusieurs</b> sous domaines et vous limitez ce strapi à seulement certains. Saisissez ci  dessous le/les domaines que vous souhaité autorisé !
+          </p>
+          {/* <p className="warning-message">
+            <b>Attention</b>, ne vous trompez pas une fois saisis, si vous rechargez la page et que ce n'est pas le bon domaine vous serez bloqué.
+          </p> */}
+        </div>
+
+        <div className='form'>
+          <TextInput
+            placeholder="Domaine autorisé"
+            label="Saisir un nom le domaine autorisé"
+            aria-label="Domaine autorisé"
+            onChange={e => setDomain(e.target.value)}
+            value={domain} />
+          <button className='btn' onClick={addDomain}>Ajouter !</button>
+        </div>
+
+        <div className='table'>
+          {domains && domains.length > 0 ? (
+            <>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th>
+                      <BaseCheckbox aria-label="Select all entries" checked={checkedAll} onClick={globalCheck} />
+                    </Th>
+                    <Th>
+                      <Typography variant="sigma">Domaine</Typography>
+                    </Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {domains.map(entry =>
+                    <Tr key={entry.id}>
+                      <Td>
+                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => { checkDomain(entry.id) }} />
+                      </Td>
+                      <Td>
+                        <Typography textColor="neutral800">{entry.name}</Typography>
+                      </Td>
+                    </Tr>)}
+                </Tbody>
+              </Table>
+              <button className='btn alert' onClick={removeDomain}>Supprimer</button>
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
+
       </div>
 
-      <div className='form'>
-        <TextInput
-          placeholder="Domaine autorisé"
-          label="Saisir un nom le domaine autorisé"
-          aria-label="Domaine autorisé"
-          onChange={e => setDomain(e.target.value)}
-          value={domain} />
-        <button className='btn' onClick={addDomain}>Ajouter !</button>
-      </div>
+    </Layout>
 
-      <div className='table'>
-        {domains && domains.length > 0 ? (
-          <>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>
-                    <BaseCheckbox aria-label="Select all entries" checked={checkedAll} onClick={globalCheck} />
-                  </Th>
-                  <Th>
-                    <Typography variant="sigma">Domaine</Typography>
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {domains.map(entry =>
-                  <Tr key={entry.id}>
-                    <Td>
-                      <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => { checkDomain(entry.id) }} />
-                    </Td>
-                    <Td>
-                      <Typography textColor="neutral800">{entry.name}</Typography>
-                    </Td>
-                  </Tr>)}
-              </Tbody>
-            </Table>
-            <button className='btn alert' onClick={removeDomain}>Supprimer</button>
-          </>
-        ) : (
-          <></>
-        )}
-      </div>
-    </div>
   );
 };
 
