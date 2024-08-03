@@ -15,82 +15,59 @@ const HomePage = () => {
   const fetchDomains = async () => {
     if (isLoading === false) setIsLoading(true);
     const data = await domainRequest.getDomains();
-    setDomains(data);
+    const updatedData = data.map(domain => ({
+      ...domain,
+      checked: checkedAll
+    }));
+    setDomains(updatedData);
     setIsLoading(false);
-  }
+  };
 
   useEffect(() => {
     fetchDomains();
   }, []);
 
-  const addDomain = async () => {
-    if (!domain) return;
+  const isInDomainList = (domain) => {
+    return domains.find(d => d.name === domain);
+  }
 
-    const id = domains.length + 1;
-    setDomains([...domains, { id: id, name: domain, checked: false, immutable: false }]);
-    setDomain('');
-  };
-
-  const removeDomain = async () => {
-    const currentDomain = domains.find(domain => domain.immutable);
-    const otherDomains = domains.filter(domain => !domain.immutable);
-
-    if (currentDomain.checked && otherDomains.length === 0) {
-      alert('Vous ne pouvez pas supprimer le domaine actuel s\'il est le seul dans la liste.');
-      return;
-    }
-
-    if (currentDomain.checked && otherDomains.length > 0) {
-      const confirmDelete = window.confirm('Êtes-vous sûr de vouloir supprimer le domaine actuel ?');
-      if (!confirmDelete) {
-        return;
-      }
-    }
-
-    const newDomains = domains.filter(domain => domain.checked === false || domain.immutable === true);
-    setDomains(newDomains);
-
-    if (checkedAll) {
-      setCheckedAll(false);
+  const handleAddDomain = async () => {
+    if (domain && !isInDomainList(domain)) {
+      await domainRequest.addDomain({ "data": { "name": domain } });
+      setDomain('');
+      fetchDomains();
     }
   };
 
-  const checkDomain = async (id) => {
-    const newDomains = domains.map(domain => {
+  const handleDeleteDomain = async () => {
+    const selectedDomains = domains.filter(domain => domain.checked);
+    selectedDomains.forEach(async domain => {
+      await domainRequest.deleteDomain(domain.id);
+    });
+    fetchDomains();
+  }
+
+  const handleCheckAll = () => {
+    const updatedDomains = domains.map(domain => ({
+      ...domain,
+      checked: !checkedAll
+    }));
+    setDomains(updatedDomains);
+    setCheckedAll(!checkedAll);
+  }
+
+  const handleCheck = (id) => {
+    const updatedDomains = domains.map(domain => {
       if (domain.id === id) {
-        return { ...domain, checked: !domain.checked };
+        return {
+          ...domain,
+          checked: !domain.checked
+        }
       }
       return domain;
     });
-    setDomains(newDomains);
-
-    if (newDomains.filter(domain => domain.checked === false).length === 0) {
-      setCheckedAll(true);
-    }
-
-    if (newDomains.filter(domain => domain.checked === true).length === 0) {
-      setCheckedAll(false);
-    }
-  };
-
-  const globalCheck = async () => {
-    setCheckedAll(!checkedAll);
-    if (checkedAll) {
-      uncheckAll();
-    } else {
-      checkAll();
-    }
-  };
-
-  const checkAll = async () => {
-    const newDomains = domains.map(domain => ({ ...domain, checked: true }));
-    setDomains(newDomains);
-  };
-
-  const uncheckAll = async () => {
-    const newDomains = domains.map(domain => ({ ...domain, checked: false }));
-    setDomains(newDomains);
-  };
+    setDomains(updatedDomains);
+  }
 
   if (isLoading) {
     return <LoadingIndicatorPage />;
@@ -122,18 +99,27 @@ const HomePage = () => {
             label="Saisir un nom le domaine autorisé"
             aria-label="Domaine autorisé"
             onChange={e => setDomain(e.target.value)}
+            onKeyPress={e => {
+              if (e.key === 'Enter') {
+              handleAddDomain();
+              }
+            }}
             value={domain} />
-          <button className='btn' onClick={addDomain}>Ajouter !</button>
+          <button
+            className='btn'
+            onClick={handleAddDomain}
+          >Ajouter !</button>
         </div>
 
         <div className='table'>
           {domains && domains.length > 0 ? (
             <>
+              <button className='btn alert' onClick={handleDeleteDomain}>Supprimer</button>
               <Table>
                 <Thead>
                   <Tr>
                     <Th>
-                      <BaseCheckbox aria-label="Select all entries" checked={checkedAll} onClick={globalCheck} />
+                      <BaseCheckbox aria-label="Select all entries" checked={checkedAll} onClick={handleCheckAll} />
                     </Th>
                     <Th>
                       <Typography variant="sigma">Domaine</Typography>
@@ -144,7 +130,7 @@ const HomePage = () => {
                   {domains.map(entry =>
                     <Tr key={entry.id}>
                       <Td>
-                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => { checkDomain(entry.id) }} />
+                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => {handleCheck(entry.id)}} />
                       </Td>
                       <Td>
                         <Typography textColor="neutral800">{entry.name}</Typography>
@@ -152,7 +138,6 @@ const HomePage = () => {
                     </Tr>)}
                 </Tbody>
               </Table>
-              <button className='btn alert' onClick={removeDomain}>Supprimer</button>
             </>
           ) : (
             <></>

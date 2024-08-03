@@ -6,6 +6,20 @@ const domainsRequest = {
             method: "GET",
         });
     },
+
+    addDomain: async (data) => {
+        console.log(data);
+        return await request("/domain-restrictor/create", {
+            method: "POST",
+            body: data,
+        });
+    },
+    
+    deleteDomain: async (id) => {
+        return await request(`/domain-restrictor/delete/${id}`, {
+            method: "DELETE",
+        });
+    }
 }
 
 export default domainsRequest;
