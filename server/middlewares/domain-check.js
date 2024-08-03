@@ -17,13 +17,16 @@ module.exports = async (ctx, next) => {
   const requestHost = ctx.request.hostname;
   // Récupérez la liste des domaines autorisés depuis votre configuration ou base de données
 
-  const defaultDomain = ['localhost'];
+  const defaultDomain = [];
   const allowedDomains = (await strapi.plugin("domain-restrictor").service("domain").find(ctx.query)).map(domain => domain.name);
   allowedDomains.push(...defaultDomain);
-
-  console.log(`Domaines autorisés : ${allowedDomains}`);
   
-  if (allowedDomains.includes(requestHost)) {
+  const authorizedAccess = () => {
+    if(allowedDomains.length === 0) return true;
+    return allowedDomains.includes(requestHost);
+  }
+  
+  if (authorizedAccess()) {
     console.log(`Domaine autorisé : ${requestHost}`);
     await next();
   } else {
