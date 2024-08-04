@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Strapi plugin that enforces domain-based access control by managing allowed domains directly from the admin panel.",
   "strapi": {
-    "name": "Domain Restrictor",
+    "name": "domain-restrictor",
     "description": "A plugin for restricting access to your Strapi application based on allowed domains.",
     "kind": "plugin",
     "displayName": "Domain Restrictor"
