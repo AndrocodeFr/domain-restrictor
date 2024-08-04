@@ -40,6 +40,10 @@
         flex-direction: column;
         gap: 12px;
 
+        input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+        }
+
         /* Si la résolution est dessous de 1000 Pixels en largeur  Alors supprimez le padding*/
 
         @media (max-width: 1000px){
@@ -65,3 +69,5 @@
         }
     }
 }
+
+
