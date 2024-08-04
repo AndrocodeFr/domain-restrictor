@@ -1,9 +1,9 @@
 {
   "name": "domain-restrictor",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "This is the description of the plugin.",
   "strapi": {
-    "name": "domain-restrictor",
+    "name": "Limiteur de domaine",
     "description": "Description of Domain Restrictor plugin",
     "kind": "plugin",
     "displayName": "Domain Restrictor"
@@ -27,11 +27,11 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "BORIES Bastien"
   },
   "maintainers": [
     {
-      "name": "A Strapi developer"
+      "name": "BORIES Bastien"
     }
   ],
   "engines": {
