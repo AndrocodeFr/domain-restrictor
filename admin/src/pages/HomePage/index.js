@@ -12,13 +12,24 @@ const HomePage = () => {
   const [domains, setDomains] = useState([]);
   const [checkedAll, setCheckedAll] = useState(false);
 
+  const getCurrentDomain = () => {
+    return window.location.hostname;
+  };
+
   const fetchDomains = async () => {
     if (isLoading === false) setIsLoading(true);
     const data = await domainRequest.getDomains();
-    const updatedData = data.map(domain => ({
+    const currentDomain = getCurrentDomain();
+    let updatedData = data.map(domain => ({
       ...domain,
-      checked: checkedAll
+      checked: domain.name === currentDomain ? false : checkedAll
     }));
+
+    if (!updatedData.find(d => d.name === currentDomain)) {
+      await domainRequest.addDomain({ "data": { "name": currentDomain } });
+      updatedData = [...updatedData, { id: Date.now(), name: currentDomain, checked: false }];
+    }
+
     setDomains(updatedData);
     setIsLoading(false);
   };
@@ -42,19 +53,21 @@ const HomePage = () => {
   const handleDeleteDomain = async () => {
     const selectedDomains = domains.filter(domain => domain.checked);
     selectedDomains.forEach(async domain => {
+      if(domain.name === getCurrentDomain()) return;
       await domainRequest.deleteDomain(domain.id);
     });
     fetchDomains();
   }
-
+  
   const handleCheckAll = () => {
+    const currentDomain = getCurrentDomain();
     const updatedDomains = domains.map(domain => ({
       ...domain,
-      checked: !checkedAll
+      checked: domain.name !== currentDomain ? !checkedAll : domain.checked
     }));
     setDomains(updatedDomains);
     setCheckedAll(!checkedAll);
-  }
+  };
 
   const handleCheck = (id) => {
     const updatedDomains = domains.map(domain => {
@@ -67,6 +80,11 @@ const HomePage = () => {
       return domain;
     });
     setDomains(updatedDomains);
+
+    // if all domains are checked exepte currentDomain, checkedAll is true
+    const currentDomain = getCurrentDomain();
+    const checkedAll = updatedDomains.filter(domain => domain.name !== currentDomain).every(domain => domain.checked);
+    setCheckedAll(checkedAll);
   }
 
   if (isLoading) {
@@ -130,7 +148,7 @@ const HomePage = () => {
                   {domains.map(entry =>
                     <Tr key={entry.id}>
                       <Td>
-                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => {handleCheck(entry.id)}} />
+                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => {handleCheck(entry.id)}} disabled={getCurrentDomain() === entry.name} />
                       </Td>
                       <Td>
                         <Typography textColor="neutral800">{entry.name}</Typography>

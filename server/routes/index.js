@@ -14,7 +14,6 @@ module.exports = [
     handler: 'domain.find',
     config: {
       policies: [],
-      auth: false,
     },
   },
 
@@ -24,7 +23,6 @@ module.exports = [
     handler: 'domain.create',
     config: {
       policies: [],
-      auth: false,
     },
   },
 
@@ -34,7 +32,6 @@ module.exports = [
     handler: 'domain.delete',
     config: {
       policies: [],
-      auth: false,
     },
   },
 ];
