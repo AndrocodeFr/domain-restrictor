@@ -1,10 +1,10 @@
 {
   "name": "domain-restrictor",
   "version": "1.0.0",
-  "description": "This is the description of the plugin.",
+  "description": "A Strapi plugin that enforces domain-based access control by managing allowed domains directly from the admin panel.",
   "strapi": {
-    "name": "Limiteur de domaine",
-    "description": "Description of Domain Restrictor plugin",
+    "name": "Domain Restrictor",
+    "description": "A plugin for restricting access to your Strapi application based on allowed domains.",
     "kind": "plugin",
     "displayName": "Domain Restrictor"
   },
@@ -27,16 +27,35 @@
     "styled-components": "^5.2.1"
   },
   "author": {
-    "name": "BORIES Bastien"
+    "name": "BORIES Bastien",
+    "email": "bastienbories81pro@gmail.com",
+    "url": "https://github.com/AndrocodeFr"
   },
   "maintainers": [
     {
-      "name": "BORIES Bastien"
+      "name": "BORIES Bastien",
+      "email": "bastienbories81pro@gmail.com",
+      "url": "https://github.com/AndrocodeFr"
     }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndrocodeFr/domain-restrictor.git"
+  },
+  "keywords": [
+    "strapi",
+    "plugin",
+    "domain",
+    "restriction",
+    "access control"
   ],
   "engines": {
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AndrocodeFr/domain-restrictor/issues"
+  },
+  "homepage": "https://github.com/AndrocodeFr/domain-restrictor#readme"
 }
