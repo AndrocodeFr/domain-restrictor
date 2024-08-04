@@ -1,5 +1,5 @@
 {
-  "name": "domain-restrictor",
+  "name": "@androcode/domain-restrictor",
   "version": "1.0.0",
   "description": "A Strapi plugin that enforces domain-based access control by managing allowed domains directly from the admin panel.",
   "strapi": {
