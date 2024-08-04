@@ -95,8 +95,8 @@ const HomePage = () => {
     <Layout sideNav={null}>
 
       <BaseHeaderLayout
-        title="Limiteur de domaine"
-        description="Permet de limiter l'accès à votre strapi à certains domaines"
+        title="Domain Restrictor"
+        description="Allows you to restrict access to your Strapi to certain domains"
         as="h1"
       />
 
@@ -104,35 +104,35 @@ const HomePage = () => {
 
         <div className='description'>
           <p>
-            Sur votre server vous possédez <b>plusieurs</b> sous domaines et vous limitez ce strapi à seulement certains. Saisissez ci  dessous le/les domaines que vous souhaité autorisé !
+            On your server, you have <b>multiple</b> (sub)domains and you restrict this Strapi to only certain ones. Enter the domain(s) you want to authorize below!
           </p>
           {/* <p className="warning-message">
-            <b>Attention</b>, ne vous trompez pas une fois saisis, si vous rechargez la page et que ce n'est pas le bon domaine vous serez bloqué.
+            <b>Warning</b>, be careful once entered, if you reload the page and it is not the correct domain, you will be blocked.
           </p> */}
         </div>
 
         <div className='form'>
           <TextInput
-            placeholder="Domaine autorisé"
-            label="Saisir un nom le domaine autorisé"
-            aria-label="Domaine autorisé"
+            placeholder="Authorized domain"
+            label="Enter an authorized domain name"
+            aria-label="Authorized domain"
             onChange={e => setDomain(e.target.value)}
             onKeyPress={e => {
               if (e.key === 'Enter') {
-              handleAddDomain();
+                handleAddDomain();
               }
             }}
             value={domain} />
           <button
             className='btn'
             onClick={handleAddDomain}
-          >Ajouter !</button>
+          >Add!</button>
         </div>
 
         <div className='table'>
           {domains && domains.length > 0 ? (
             <>
-              <button className='btn alert' onClick={handleDeleteDomain}>Supprimer</button>
+              <button className='btn alert' onClick={handleDeleteDomain}>Delete</button>
               <Table>
                 <Thead>
                   <Tr>
@@ -140,7 +140,7 @@ const HomePage = () => {
                       <BaseCheckbox aria-label="Select all entries" checked={checkedAll} onClick={handleCheckAll} />
                     </Th>
                     <Th>
-                      <Typography variant="sigma">Domaine</Typography>
+                      <Typography variant="sigma">Domain</Typography>
                     </Th>
                   </Tr>
                 </Thead>
@@ -148,7 +148,7 @@ const HomePage = () => {
                   {domains.map(entry =>
                     <Tr key={entry.id}>
                       <Td>
-                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => {handleCheck(entry.id)}} disabled={getCurrentDomain() === entry.name} />
+                        <BaseCheckbox aria-label={`Select ${entry.id}`} checked={entry.checked} onClick={e => { handleCheck(entry.id) }} disabled={getCurrentDomain() === entry.name} />
                       </Td>
                       <Td>
                         <Typography textColor="neutral800">{entry.name}</Typography>
